@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+    opts.banner = "Usage: bi [options]"
+
+    opts.on("-b", "--build[-space]", "Specifies the build space folder.") do |v|
+        options[:buildspace] = v
+    end
+end.parse!
+
+puts options
