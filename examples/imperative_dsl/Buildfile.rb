@@ -1,8 +1,10 @@
 require 'buildit'
 
-class Simple < Package
-    include_dirs ['include1', 'include2']
-    include_dirs 'include3'
-end
+package 'simple'
 
-puts Simple.include_dirs
+include_dirs ['include', 'vendor/include']
+include_dirs '/usr/local/include/pkg-1.1'
+
+executable :foo, ['src/foo.cpp', 'src/bar.cpp']
+
+summarize
