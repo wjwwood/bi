@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>simple</name>
+  <version>0.1.0</version>
+  <description>This is a package!</description>
+
+  <maintainer email="wjwwood@gmail.com">William Woodall</maintainer>
+  <maintainer>William Woodall</maintainer>
+
+  <license>MIT</license>
+
+  <url type="website">https://github.com/wjwwood/bi</url>
+  <url type="repository">https://github.com/wjwwood/bi</url>
+  <url type="bugtracker">https://github.com/wjwwood/bi/issues</url>
+
+  <author email="wjwwood@gmail.com">William Woodall</author>
+
+  <buildtool_depend>buildit</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>roscpp</run_depend>
+
+  <export>
+    <build_type>buildit</build_type>
+  </export>
+</package>
