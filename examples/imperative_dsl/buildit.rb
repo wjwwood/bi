@@ -10,30 +10,73 @@ class ContextSingleton
     end
 end
 
-def package(name)
+class Executable
+    attr_reader :name, :files
+
+    def initialize name, *args
+        @name = name
+        @files = []
+        for arg in args
+            if arg.kind_of? Array
+                @files.concat arg
+            else
+                @files << arg
+            end
+        end
+        @link_libraries = []
+    end
+
+    def link_libraries *args
+        return @link_libraries if args.empty?
+        for arg in args
+            if arg.kind_of? Array
+                @link_libraries.concat arg
+            else
+                @link_libraries << arg
+            end
+        end
+    end
+end
+
+def package name
     c = ContextSingleton.instance
     c.current_package = name
     c.package_dict[name] = {}
 end
 
-def include_dirs(val)
+def include_dirs *args
     c = ContextSingleton.instance
     if not c.package_dict[c.current_package].has_key? 'include_dirs'
         c.package_dict[c.current_package]['include_dirs'] = []
     end
-    if val.kind_of? Array
-        c.package_dict[c.current_package]['include_dirs'].concat val
-    else
-        c.package_dict[c.current_package]['include_dirs'] << val
+    for val in args
+        if val.kind_of? Array
+            c.package_dict[c.current_package]['include_dirs'].concat val
+        else
+            c.package_dict[c.current_package]['include_dirs'] << val
+        end
     end
 end
 
-def executable(name, files)
+def executable name, *files
     c = ContextSingleton.instance
     if not c.package_dict[c.current_package].has_key? 'executables'
         c.package_dict[c.current_package]['executables'] = {}
+        if not c.package_dict[c.current_package]['executables'].has_key? name
+            c.package_dict[c.current_package]['executables'][name] = Executable.new name, *files
+        else
+            raise "Executabe #{name} already exists"
+        end
+        c.package_dict[c.current_package]['executables'][name]
     end
-    c.package_dict[c.current_package]['executables'][name] = files
+end
+
+def link_libraries name, *args
+    c = ContextSingleton.instance
+    if not c.package_dict[c.current_package]['executables'].has_key? name
+        raise "No such executable #{name}."
+    end
+    c.package_dict[c.current_package]['executables'][name].link_libraries args
 end
 
 def summarize
@@ -44,7 +87,7 @@ def summarize
         if not pkg_dict.has_key? 'include_dirs'
             msg << "    No include directories."
         else
-            msg << "    Include directories:"
+            msg << "    include directories:"
             pkg_dict['include_dirs'].each do |inc_dir|
                 msg << "      '#{inc_dir}'"
             end
@@ -52,11 +95,16 @@ def summarize
         if not pkg_dict.has_key? 'executables'
             msg << "    No executables."
         else
-            msg << "    Executables:"
-            pkg_dict['executables'].each do |name, files|
+            msg << "    executables:"
+            pkg_dict['executables'].each do |name, exec|
                 msg << "      '#{name}':"
-                files.each do |file|
-                    msg << "        '#{file}'"
+                msg << "        files:"
+                exec.files.each do |file|
+                    msg << "          '#{file}'"
+                end
+                msg << "        link libraries:"
+                exec.link_libraries.each do |lib|
+                    msg << "          '#{lib}'"
                 end
             end
         end
